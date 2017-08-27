@@ -7,59 +7,56 @@ class Cell {
   // Position of the centre of the Cell
   PVector position;
 
-  // Other useful PVectors for checking mouse position (could improve?)
-  PVector topCorner;
-  PVector bottomCorner;
-
-  // Row and column info, used exactly once in Grid.getChilds() (could improve?)
-  int col;
-  int row;
-
   int numAdjMines = 0;
+  
+  float tallness;
+  float wideness;
 
   // Set of neighbors ( A set was chosen because the same neighbor cannot be chosen twice )
   Set<Cell> neighbors = new HashSet(8);
 
-  Cell( int row, int col ) {
-    this.col = col;
-    this.row = row;
-    position = new PVector( (col + 0.5) * colSize, (row + 0.5) * rowSize );
-    topCorner = new PVector( col * colSize, row * rowSize );
-    bottomCorner = new PVector( (col + 1) * colSize, (row + 1) * rowSize );
+  Cell( int row, int col, float tallness, float wideness ) {
+    this.tallness = tallness;
+    this.wideness = wideness;
+    
+    position = new PVector( (col + 0.5) * wideness, (row + 0.5) * tallness );
   }
 
   // Shows mine if present or number of adjacent mines otherwise
   void showMine( color col ) {
     if ( isMine ) {
       fill( col );
-      ellipse( position.x, position.y, colSize/2, rowSize/2 );
+      ellipse( position.x, position.y, wideness/2, tallness/2 );
     } else if ( numAdjMines > 0 ) {
       fill(10);
-      textSize(20);
+      textSize( width / 30 );
       textAlign( CENTER, CENTER );
       text( numAdjMines, position.x, position.y );
     }
   }
-  
+
   void showMine() {
-    showMine( 45 );
+    showMine( mineColor );
   }
 
   // Utilizes showMine() function and draws box on top in appropriate color
   void showCell() {
-    if( isRevealed ) 
+    if ( isRevealed ) 
       noFill();
     else if ( isFlagged )
-      fill( 200, 0, 0 );
+      fill( flaggedColor );
     else
-      fill( 145 );
-    rect( position.x, position.y, colSize, rowSize );
+      fill( cellColor );
+    rect( position.x, position.y, wideness, tallness );
   }
 
   // Returns true if the mouse position is above this Cell
   boolean mouseIsOver() {
-    return mouseX > topCorner.x && mouseX < bottomCorner.x 
-        && mouseY > topCorner.y && mouseY < bottomCorner.y;
+    float top = position.y - tallness / 2;
+    float bottom = position.y + tallness / 2;
+    float left = position.x - wideness / 2;
+    float right = position.x + wideness / 2;
+    return mouseX > left && mouseX < right && mouseY > top && mouseY < bottom;
   }
 
   void cascade( HashSet<Cell> cascaded ) {
@@ -70,6 +67,19 @@ class Cell {
         neighbor.cascade( cascaded );
       }
     }
+  }
+
+  void onLeftClick() {
+    if ( !isFlagged ) {
+      isRevealed = true;
+      if ( numAdjMines == 0 && !isMine ) {
+        cascade( new HashSet<Cell>() );
+      }
+    }
+  }
+
+  void onRightClick() {
+    isFlagged = !isFlagged;
   }
 
   //// *Deprecated*

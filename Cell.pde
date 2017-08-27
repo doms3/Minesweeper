@@ -29,9 +29,9 @@ class Cell {
   }
 
   // Shows mine if present or number of adjacent mines otherwise
-  private void showMine() {
+  void showMine( color col ) {
     if ( isMine ) {
-      fill( 45 );
+      fill( col );
       ellipse( position.x, position.y, colSize/2, rowSize/2 );
     } else if ( numAdjMines > 0 ) {
       fill(10);
@@ -40,11 +40,14 @@ class Cell {
       text( numAdjMines, position.x, position.y );
     }
   }
+  
+  void showMine() {
+    showMine( 45 );
+  }
 
   // Utilizes showMine() function and draws box on top in appropriate color
-  void show() {
-    showMine();
-    if ( isRevealed )
+  void showCell() {
+    if( isRevealed ) 
       noFill();
     else if ( isFlagged )
       fill( 200, 0, 0 );

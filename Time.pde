@@ -1,9 +1,9 @@
 static class Time {
   // Utility class for the timer at the bottom
   
-  static String returnTime( int millisElapsed ) {
+  static String returnTime( PApplet instance ) {
     String time;
-    int millis = millisElapsed;
+    int millis = instance.millis();
     int seconds = millis / 1000;
     int minutes = seconds / 60;
     seconds = seconds % 60;

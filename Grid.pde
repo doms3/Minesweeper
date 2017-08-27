@@ -6,7 +6,6 @@ class Grid {
   Grid() {
     this.createCells();
     this.spawnMines();
-    this.getAllChilds();
   }
 
   // All the cells are created here
@@ -23,7 +22,7 @@ class Grid {
   // is given to ensure at least one square has no mine
   private void spawnMines() {
     int minesOnField = 0;
-    while ( minesOnField < totalMines && minesOnField < cells.length ) {
+    while ( minesOnField < totalMines && minesOnField < cells.length - 1) {
       int index = floor( random( 0, cells.length ) );
       if ( !cells[index].isMine ) {
         cells[index].isMine = true;
@@ -64,7 +63,7 @@ class Grid {
   //}
   
   // Returns the Cell currently hovered by the mouse
-  // This function may return null and this should be checked
+  // This function may return null thus this should be checked
   Cell currentCellHovered() {
    for( int i = 0; i < cells.length; i++ ) {
      if( cells[i].mouseIsOver() ) {
@@ -77,7 +76,9 @@ class Grid {
   // Shows all the cells on the screen
   void show() {
     for( int i = 0; i < cells.length; i++ ) {
-      cells[i].show();
+      if( cells[i].isRevealed )
+        cells[i].showMine();
+      cells[i].showCell();
     }
   }
   
@@ -99,5 +100,15 @@ class Grid {
       }
     }
     return false;
+  }
+  
+  void addOneMine( Cell toBeIgnored ) {
+    while( true ) {
+      int index = floor( random( 0, cells.length ) );
+      if( !cells[index].isMine && cells[index] != toBeIgnored ) {
+        cells[index].isMine = true;
+        return;
+      }
+    }
   }
 }

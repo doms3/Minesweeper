@@ -39,7 +39,7 @@ void draw() {
   fill(0);
   textSize( 32 * extraHeight / 40 );
   textAlign( LEFT, CENTER );
-  text( totalMines - grid.suspectedMines, 0, width + extraHeight / 2 );
+  text( totalMines - grid.getSuspectedMines(), 0, width + extraHeight / 2 );
   textAlign( CENTER, CENTER );
   text( Time.returnTime( this ), width / 2, width + extraHeight / 2 );
 }

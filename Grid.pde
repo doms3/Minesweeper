@@ -1,13 +1,14 @@
 class Grid {
   // Contains all the cells in the Grid
-  Cell[] cells = new Cell[ rows * cols ];
-  int suspectedMines = 0;
+  private Cell[] cells = new Cell[ rows * cols ];
   
-  float colSize;
-  float rowSize;
+  private int suspectedMines = 0;
+  
+  private float colSize;
+  private float rowSize;
 
   // Grid is populated, mines are set and children are found all in the constructor
-  Grid() {
+  public Grid() {
     colSize = width / cols;
     rowSize = width / rows;
     
@@ -45,12 +46,9 @@ class Grid {
       for ( int j = -1; j <= 1; j++ ) {
         int targetRow = row + i;
         int targetCol = col + j;
-        if ( targetRow >= 0 && targetRow < rows 
-          && targetCol >= 0 && targetCol < cols ) {
+        if ( targetRow >= 0 && targetRow < rows && targetCol >= 0 && targetCol < cols ) {
           int index = targetRow * cols + targetCol;
-          cell.neighbors.add( cells[index] );
-          if ( cells[index].isMine )
-            cell.numAdjMines++;
+          cell.addNeighbor( cells[index] );
         }
       }
     }
@@ -63,36 +61,28 @@ class Grid {
       getChilds( cells[i], row, col );
     }
   }
-
-  //// *Deprecated*
-  //private void setAllAdjMines() {
-  //  for( int i = 0; i < cells.length; i++ ) {
-  //    cells[i].getAdjMines();
-  //  }
-  //}
-
-  // Returns the Cell currently hovered by the mouse
-  // This function may return null thus this should be checked
-  Cell currentCellHovered() {
-    for ( int i = 0; i < cells.length; i++ ) {
-      if ( cells[i].mouseIsOver() ) {
-        return cells[i];
-      }
+  
+  private Cell currentCellHovered() {
+    int row = floor( mouseY / rowSize );
+    int col = floor( mouseX / colSize );
+    
+    if( row >= 0 && row < rows && col >= 0 && col < cols ) {
+      int index = row * cols + col;
+      return cells[ index ];
     }
+    
     return null;
   }
 
   // Shows all the cells on the screen
-  void show() {
+  public void show() {
     for ( int i = 0; i < cells.length; i++ ) {
-      if ( cells[i].isRevealed )
-        cells[i].showMine();
-      cells[i].showCell();
+      cells[i].show();
     }
   }
 
   // Checks the win condition
-  boolean hasWon() {
+  private boolean hasWon() {
     for ( int i = 0; i < cells.length; i++ ) {
       if ( !cells[i].isMine && !cells[i].isRevealed ) {
         return false;
@@ -102,7 +92,7 @@ class Grid {
   }
 
   // Checks the loss condition
-  boolean hasLost() {
+  private boolean hasLost() {
     for ( int i = 0; i < cells.length; i++ ) {
       if ( cells[i].isMine && cells[i].isRevealed ) {
         return true;
@@ -111,11 +101,11 @@ class Grid {
     return false;
   }
 
-  void addOneMine( Cell toBeIgnored ) {
+  private void addOneMine( Cell toBeIgnored ) {
     while ( true ) {
       int index = floor( random( 0, cells.length ) );
-      if ( !cells[index].isMine && cells[index] != toBeIgnored ) {
-        cells[index].isMine = true;
+      if ( !cells[index].isMine() && cells[index] != toBeIgnored ) {
+        cells[index].setMine( true );
         return;
       }
     }
@@ -135,7 +125,7 @@ class Grid {
     }
   }
 
-  void onRightClick() {
+  public void onRightClick() {
     Cell selectedCell = currentCellHovered();
     if ( selectedCell != null ) {
       if ( suspectedMines < totalMines ) {
@@ -148,21 +138,25 @@ class Grid {
     }
   }
 
-  void onLeftClick() {
+  public void onLeftClick() {
     Cell selectedCell = currentCellHovered();
     if( selectedCell != null ) {
       selectedCell.onLeftClick();
     }
   }
 
-  void onFirstClick() {
+  public void onFirstClick() {
     Cell selectedCell = currentCellHovered();
     if ( selectedCell != null ) {
-      if ( selectedCell.isMine ) {
-        selectedCell.isMine = false;
+      if ( selectedCell.isMine() ) {
+        selectedCell.onFirstClick();
         grid.addOneMine( selectedCell );
       }
     }
     getAllChilds();
+  }
+  
+  public int getSuspectedMines() {
+    return suspectedMines;
   }
 }
